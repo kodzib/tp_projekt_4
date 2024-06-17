@@ -3,6 +3,7 @@
 */
 #include "simulate.h"
 #include <matplot/matplot.h>
+#include <thread>
 
 Eigen::MatrixXf LQR(PlanarQuadrotor &quadrotor, float dt) {
     /* Calculate LQR gain matrix */
@@ -27,9 +28,12 @@ Eigen::MatrixXf LQR(PlanarQuadrotor &quadrotor, float dt) {
     return LQR(A_discrete, B_discrete, Q, R);
 }
 
+    //plotowanie
 void plotTrajectory(const std::vector<float>& x, const std::vector<float>& y, const std::vector<float>& theta) {
-    //plotowanie, zbudowalismy go, nie dziala (jak wylaczysz matplota to sie crashuje projekt
     matplot::plot3(x, y, theta);
+    matplot::xlabel("X");
+    matplot::ylabel("Y");
+    matplot::zlabel("Theta");
     matplot::show();
 }
 
@@ -108,7 +112,8 @@ int main(int argc, char* args[])
                     quadrotor.SetGoal(goal_state);
                 }
                 else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_p) {
-                    plotTrajectory(x_history, y_history, theta_history);
+                    std::thread plot_thread(plotTrajectory, x_history, y_history, theta_history);
+                    plot_thread.detach();
                 }
                 
             }
