@@ -2,6 +2,7 @@
  * SDL window creation adapted from https://github.com/isJuhn/DoublePendulum
 */
 #include "simulate.h"
+#include <matplot/matplot.h>
 
 Eigen::MatrixXf LQR(PlanarQuadrotor &quadrotor, float dt) {
     /* Calculate LQR gain matrix */
@@ -24,6 +25,12 @@ Eigen::MatrixXf LQR(PlanarQuadrotor &quadrotor, float dt) {
     B_discrete = dt * B;
     
     return LQR(A_discrete, B_discrete, Q, R);
+}
+
+void plotTrajectory(const std::vector<float>& x, const std::vector<float>& y, const std::vector<float>& theta) {
+    //plotowanie, zbudowalismy go, nie dziala (jak wylaczysz matplota to sie crashuje projekt
+    matplot::plot3(x, y, theta);
+    matplot::show();
 }
 
 void control(PlanarQuadrotor &quadrotor, const Eigen::MatrixXf &K) {
@@ -100,6 +107,9 @@ int main(int argc, char* args[])
                     goal_state << x, y, 0, 0, 0, 0;
                     quadrotor.SetGoal(goal_state);
                 }
+                else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_p) {
+                    plotTrajectory(x_history, y_history, theta_history);
+                }
                 
             }
 
@@ -143,3 +153,4 @@ int init(std::shared_ptr<SDL_Window>& gWindow, std::shared_ptr<SDL_Renderer>& gR
     }
     return 0;
 }
+
