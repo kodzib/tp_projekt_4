@@ -50,28 +50,43 @@ void PlanarQuadrotorVisualizer::render(std::shared_ptr<SDL_Renderer> &gRenderer)
         body_y[3] - (y_arm_size * cos(q_theta) + x_arm_size * sin(q_theta)) };
 
     Sint16 r_prop_x[6] = {
-        r_body_x[3] - (x_prop_size * cos(q_theta) - y_prop_size * sin(q_theta)),
-        r_body_x[3] + (x_prop_size * cos(q_theta) - y_prop_size * sin(q_theta)),
-        r_body_x[3] + (x_extra_prop_size * cos(q_theta)),
-        r_body_x[3] + (x_prop_size * cos(-q_theta) - y_prop_size * sin(-q_theta)),
         r_body_x[3] - (x_prop_size * cos(-q_theta) - y_prop_size * sin(-q_theta)),
-        r_body_x[3] - (x_extra_prop_size * cos(q_theta))
+        r_body_x[3] + (x_prop_size * cos(-q_theta) - y_prop_size * sin(-q_theta)),
+        r_body_x[3] + (x_extra_prop_size * cos(-q_theta)),
+        r_body_x[3] + (x_prop_size * cos(q_theta) - y_prop_size * sin(q_theta)),
+        r_body_x[3] - (x_prop_size * cos(q_theta) - y_prop_size * sin(q_theta)),
+        r_body_x[3] - (x_extra_prop_size * cos(-q_theta))
     };
     Sint16 r_prop_y[6] = {
-        r_body_y[3] - (y_prop_size * cos(q_theta) + x_prop_size * sin(q_theta)),
-        r_body_y[3] + (y_prop_size * cos(q_theta) + x_prop_size * sin(q_theta)),
-        r_body_y[3] + (x_prop_size * sin(q_theta)),
         r_body_y[3] - (y_prop_size * cos(-q_theta) + x_prop_size * sin(-q_theta)),
         r_body_y[3] + (y_prop_size * cos(-q_theta) + x_prop_size * sin(-q_theta)),
-        r_body_y[3] - (x_prop_size * sin(q_theta))
+        r_body_y[3] + (x_prop_size * sin(-q_theta)),
+        r_body_y[3] - (y_prop_size * cos(q_theta) + x_prop_size * sin(q_theta)),
+        r_body_y[3] + (y_prop_size * cos(q_theta) + x_prop_size * sin(q_theta)),
+        r_body_y[3] - (x_prop_size * sin(-q_theta))
     };
-    Sint16 l_prop_x[6] = { 0,0,0,0,0,0 };
-    Sint16 l_prop_y[6] = { 0,0,0,0,0,0 };
+    Sint16 l_prop_x[6] = {
+        l_body_x[2] - (x_prop_size * cos(-q_theta) - y_prop_size * sin(-q_theta)),
+        l_body_x[2] + (x_prop_size * cos(-q_theta) - y_prop_size * sin(-q_theta)),
+        l_body_x[2] + (x_extra_prop_size * cos(-q_theta)),
+        l_body_x[2] + (x_prop_size * cos(q_theta) - y_prop_size * sin(q_theta)),
+        l_body_x[2] - (x_prop_size * cos(q_theta) - y_prop_size * sin(q_theta)),
+        l_body_x[2] - (x_extra_prop_size * cos(-q_theta))
+    };
+    Sint16 l_prop_y[6] = {
+        l_body_y[2] - (y_prop_size * cos(-q_theta) + x_prop_size * sin(-q_theta)),
+        l_body_y[2] + (y_prop_size * cos(-q_theta) + x_prop_size * sin(-q_theta)),
+        l_body_y[2] + (x_prop_size * sin(-q_theta)),
+        l_body_y[2] - (y_prop_size * cos(q_theta) + x_prop_size * sin(q_theta)),
+        l_body_y[2] + (y_prop_size * cos(q_theta) + x_prop_size * sin(q_theta)),
+        l_body_y[2] - (x_prop_size * sin(-q_theta))
+    };
 
     SDL_SetRenderDrawColor(gRenderer.get(), 0xFF, 0xFF, 0xFF, 0xFF); // AA RR GG BB
     filledPolygonColor(gRenderer.get(), body_x, body_y, 4, 0xFF555555);
     filledPolygonColor(gRenderer.get(), l_body_x, l_body_y, 4, 0xFF555555);
     filledPolygonColor(gRenderer.get(), r_body_x, r_body_y, 4, 0xFF555555);
     filledPolygonColor(gRenderer.get(), r_prop_x, r_prop_y, 6, 0x55000000);
-    //filledCircleColor(gRenderer.get(), q_x, q_y, 5, 0xFF0000FF); // 0xRRGGBBAA chyba to zle bo jest 0xAABBGGRR
+    filledPolygonColor(gRenderer.get(), l_prop_x, l_prop_y, 6, 0x55000000);
+    //filledCircleColor(gRenderer.get(), r_prop_x[2], r_prop_y[2], 2, 0xFF0000FF); // 0xRRGGBBAA chyba to zle bo jest 0xAABBGGRR
 }
