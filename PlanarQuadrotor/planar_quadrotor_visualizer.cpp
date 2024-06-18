@@ -15,7 +15,7 @@ void PlanarQuadrotorVisualizer::render(std::shared_ptr<SDL_Renderer> &gRenderer)
     int y_box_size = 15;
     int x_arm_size = 5;
     int y_arm_size = 10;
-    int x_prop_size = 20;
+    int x_prop_size = 15;
     int y_prop_size = 7;
     int x_extra_prop_size = 25;
     /* x, y, theta coordinates */
@@ -49,18 +49,22 @@ void PlanarQuadrotorVisualizer::render(std::shared_ptr<SDL_Renderer> &gRenderer)
         body_y[3] - (y_arm_size * cos(-q_theta) + x_arm_size * sin(-q_theta)),
         body_y[3] - (y_arm_size * cos(q_theta) + x_arm_size * sin(q_theta)) };
 
-    Sint16 r_prop_x[6] = { r_body_x[3] + (x_prop_size * cos(-q_theta) - y_prop_size * sin(-q_theta)),
-        r_body_x[3] - (y_prop_size * cos(q_theta) + x_prop_size * sin(q_theta)),
-        0,
-        r_body_x[3] - (y_prop_size * cos(-q_theta) + x_prop_size * sin(-q_theta)),
-        r_body_x[3] + (y_prop_size * cos(q_theta) + x_prop_size * sin(q_theta)),
-        0};
-    Sint16 r_prop_y[6] = { r_body_y[3] + (y_prop_size * cos(-q_theta) + x_prop_size * sin(-q_theta)),
-        r_body_y[3] - (x_prop_size * cos(q_theta) - y_prop_size * sin(q_theta)),
-        0,
-        r_body_y[3] - (x_prop_size * cos(-q_theta) - y_prop_size * sin(-q_theta)),
-        r_body_y[3] + (x_prop_size * cos(q_theta) - y_prop_size * sin(q_theta)),
-        0 };
+    Sint16 r_prop_x[6] = {
+        r_body_x[3] - (x_prop_size * cos(q_theta) - y_prop_size * sin(q_theta)),
+        r_body_x[3] + (x_prop_size * cos(q_theta) - y_prop_size * sin(q_theta)),
+        r_body_x[3] + (x_extra_prop_size * cos(q_theta)),
+        r_body_x[3] + (x_prop_size * cos(-q_theta) - y_prop_size * sin(-q_theta)),
+        r_body_x[3] - (x_prop_size * cos(-q_theta) - y_prop_size * sin(-q_theta)),
+        r_body_x[3] - (x_extra_prop_size * cos(q_theta))
+    };
+    Sint16 r_prop_y[6] = {
+        r_body_y[3] - (y_prop_size * cos(q_theta) + x_prop_size * sin(q_theta)),
+        r_body_y[3] + (y_prop_size * cos(q_theta) + x_prop_size * sin(q_theta)),
+        r_body_y[3] + (x_prop_size * sin(q_theta)),
+        r_body_y[3] - (y_prop_size * cos(-q_theta) + x_prop_size * sin(-q_theta)),
+        r_body_y[3] + (y_prop_size * cos(-q_theta) + x_prop_size * sin(-q_theta)),
+        r_body_y[3] - (x_prop_size * sin(q_theta))
+    };
     Sint16 l_prop_x[6] = { 0,0,0,0,0,0 };
     Sint16 l_prop_y[6] = { 0,0,0,0,0,0 };
 
