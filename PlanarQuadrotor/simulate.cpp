@@ -29,8 +29,10 @@ Eigen::MatrixXf LQR(PlanarQuadrotor &quadrotor, float dt) {
 }
 
     //plotowanie
-void plotTrajectory(const std::vector<float>& x, const std::vector<float>& y, const std::vector<float>& theta) {
+void plot(const std::vector<float>& x, const std::vector<float>& y, const std::vector<float>& theta, std::atomic<bool>& plot_active) {
+    plot_active = false;
     matplot::plot3(x, y, theta);
+    //matplot::plot(x, y);
     matplot::xlabel("X");
     matplot::ylabel("Y");
     matplot::zlabel("Theta");
@@ -89,9 +91,11 @@ int main(int argc, char* args[])
         int x, y;
         float x_p, y_p;
         Eigen::VectorXf state = Eigen::VectorXf::Zero(6);
+     
 
         while (!quit)
-        {
+        {   
+            static std::atomic<bool> plot_active = false;
             //events
             while (SDL_PollEvent(&e) != 0)
             {
@@ -111,14 +115,16 @@ int main(int argc, char* args[])
                     goal_state << x, y, 0, 0, 0, 0;
                     quadrotor.SetGoal(goal_state);
                 }
-                else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_p) {
-                    std::thread plot_thread(plotTrajectory, x_history, y_history, theta_history);
+                else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_p && plot_active ==false) {
+                    plot_active = true;
+                    std::thread plot_thread(plot, x_history, y_history, theta_history, std::ref(plot_active));
                     plot_thread.detach();
+                    plot_active = false;
                 }
                 
             }
 
-            SDL_Delay((int) dt * 1000);
+            SDL_Delay((int)dt * 1000);
 
             SDL_SetRenderDrawColor(gRenderer.get(), 0xFF, 0xFF, 0xFF, 0xFF);
             SDL_RenderClear(gRenderer.get());
