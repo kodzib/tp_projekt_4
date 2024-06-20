@@ -126,5 +126,5 @@ void PlanarQuadrotorVisualizer::render(std::shared_ptr<SDL_Renderer>& gRenderer)
     filledPolygonColor(gRenderer.get(), r_body_x, r_body_y, 4, 0xFF555555);
     filledPolygonColor(gRenderer.get(), r_prop_x, r_prop_y, 6, color1);
     filledPolygonColor(gRenderer.get(), l_prop_x, l_prop_y, 6, color2);
-    filledCircleColor(gRenderer.get(), goal[0], goal[1], 2, 0xFF0000FF); // 0xRRGGBBAA chyba to zle bo jest 0xAABBGGRR
+    filledCircleColor(gRenderer.get(), goal[0] + x_offset, goal[1] + y_offset, 2, 0xFF0000FF); // 0xRRGGBBAA chyba to zle bo jest 0xAABBGGRR
 }
