@@ -12,10 +12,14 @@ PlanarQuadrotorVisualizer::PlanarQuadrotorVisualizer(PlanarQuadrotor *quadrotor_
     int color1 = 0x99000000;
     int color2 = 0x22000000;
     int pom;
+    float prev_xdot = 0;
+    float prev_ydot = 0;
 void PlanarQuadrotorVisualizer::render(std::shared_ptr<SDL_Renderer> &gRenderer) {
+
     Eigen::VectorXf state = quadrotor_ptr->GetState();
+
     Eigen::VectorXf goal = quadrotor_ptr->GetState() - quadrotor_ptr->GetControlState();
-    float q_x, q_y, q_theta;
+    float q_x, q_y, q_theta, xdot, ydot;
     int x_box_size = 50;
     int y_box_size = 15;
     int x_arm_size = 5;
@@ -27,6 +31,8 @@ void PlanarQuadrotorVisualizer::render(std::shared_ptr<SDL_Renderer> &gRenderer)
     q_x = state[0] ;
     q_y = state[1] ;
     q_theta = state[2];
+    xdot = state[3];
+    ydot = state[4];
 
     Sint16 body_x[4] = { q_x + (x_box_size * cos(-q_theta) - y_box_size * sin(-q_theta)),
         q_x - (x_box_size * cos(q_theta) - y_box_size * sin(q_theta)),
@@ -87,11 +93,27 @@ void PlanarQuadrotorVisualizer::render(std::shared_ptr<SDL_Renderer> &gRenderer)
         l_body_y[2] - (x_prop_size * sin(-q_theta))
     };
 
-    if (1) {
-        pom = color1;
-        color1 = color2;;
-        color2 = pom;
-    };  
+    if (sqrt(pow(xdot,2 )+pow(ydot,2)) > sqrt(pow(prev_xdot, 2) + pow(prev_ydot, 2))) {
+        if (color1!= 0x99000000 && color1 != 0x22000000) {
+            color1 = 0x99000000;
+            color2 = 0x22000000;
+        }
+            pom = color1;
+            color1 = color2;;
+            color2 = pom;
+    }
+    else{
+        if(color1!=0xFF005530 && color1!=0xFF550055){
+            color1 = 0xFF005530;
+            color2 = 0xFF550055;
+        }
+       pom = color1;
+       color1 = color2;;
+       color2 = pom;
+    };
+    //std::cout << " xdot = " << sqrt(pow(xdot, 2) + pow(ydot, 2)) << " xprevdot= " << sqrt(pow(prev_xdot, 2) + pow(prev_ydot, 2)) << std::endl;
+    prev_xdot = xdot;
+    prev_ydot = ydot;
 
     SDL_SetRenderDrawColor(gRenderer.get(), 0xFF, 0xFF, 0xFF, 0xFF); // AA RR GG BB
     filledPolygonColor(gRenderer.get(), body_x, body_y, 4, 0xFF555555);
