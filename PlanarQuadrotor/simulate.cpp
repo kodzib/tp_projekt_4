@@ -4,6 +4,11 @@
 #include "simulate.h"
 #include <matplot/matplot.h>
 #include <thread>
+#include <iostream>
+#include <windows.h>
+#include <mmsystem.h>
+#include <mciapi.h>
+#pragma comment(lib, "winmm.lib")
 
 Eigen::MatrixXf LQR(PlanarQuadrotor &quadrotor, float dt) {
     /* Calculate LQR gain matrix */
@@ -37,6 +42,11 @@ void plot(const std::vector<float>& x, const std::vector<float>& y, const std::v
     matplot::ylabel("Y");
     matplot::zlabel("Theta");
     matplot::show();
+}
+
+void play_audio() {
+    PlaySound("sound.wav", GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC | SND_LOOP);
+    std::cout << std::endl << "audio" << std::endl;
 }
 
 void control(PlanarQuadrotor &quadrotor, const Eigen::MatrixXf &K) {
@@ -91,6 +101,7 @@ int main(int argc, char* args[])
         int x, y;
         float x_p, y_p;
         Eigen::VectorXf state = Eigen::VectorXf::Zero(6);
+        play_audio();
      
 
         while (!quit)
@@ -131,6 +142,8 @@ int main(int argc, char* args[])
 
             /* Quadrotor rendering step */
             quadrotor_visualizer.render(gRenderer);
+
+            
 
             SDL_RenderPresent(gRenderer.get());
 

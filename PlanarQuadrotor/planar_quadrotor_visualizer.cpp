@@ -115,6 +115,7 @@ void PlanarQuadrotorVisualizer::render(std::shared_ptr<SDL_Renderer> &gRenderer)
     prev_xdot = xdot;
     prev_ydot = ydot;
 
+
     SDL_SetRenderDrawColor(gRenderer.get(), 0xFF, 0xFF, 0xFF, 0xFF); // AA RR GG BB
     filledPolygonColor(gRenderer.get(), body_x, body_y, 4, 0xFF555555);
     filledPolygonColor(gRenderer.get(), l_body_x, l_body_y, 4, 0xFF555555);
