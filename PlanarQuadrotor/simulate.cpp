@@ -68,7 +68,7 @@ int main(int argc, char* args[])
      * 2. Update PlanarQuadrotor from simulation when goal is changed
     */
     Eigen::VectorXf initial_state = Eigen::VectorXf::Zero(6);
-    initial_state << SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, 0, 0, 0;
+    initial_state << 0, 0, 0, 0, 0, 0;
     PlanarQuadrotor quadrotor(initial_state);
     PlanarQuadrotorVisualizer quadrotor_visualizer(&quadrotor);
     /**
@@ -77,7 +77,7 @@ int main(int argc, char* args[])
      * For implemented LQR controller, it has to be [x, y, 0, 0, 0, 0]
     */
     Eigen::VectorXf goal_state = Eigen::VectorXf::Zero(6);
-    goal_state << SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, 0, 0, 0;
+    goal_state << 0, 0, 0, 0, 0, 0;
     quadrotor.SetGoal(goal_state);
     /* Timestep for the simulation */
     const float dt = 0.001;
@@ -117,13 +117,9 @@ int main(int argc, char* args[])
                 else if (e.type == SDL_MOUSEMOTION)
                 {
                     SDL_GetMouseState(&x, &y);
-                    x_p = float(x) / SCREEN_WIDTH;
-                    y_p = float(y) / SCREEN_HEIGHT;
-                    //std::cout << "Mouse position: (" << x << ", " << y << ") " << x_p << ' ' << y_p << std::endl;
                 }
                 else if (e.type == SDL_MOUSEBUTTONDOWN) {
-                    //std::cout << "Mouse pressed" << std::endl;
-                    goal_state << x, y, 0, 0, 0, 0;
+                    goal_state << x - (SCREEN_WIDTH / 2), y - (SCREEN_HEIGHT / 2), 0, 0, 0, 0;
                     quadrotor.SetGoal(goal_state);
                 }
                 else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_p && plot_active ==false) {
