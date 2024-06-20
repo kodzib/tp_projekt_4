@@ -34,8 +34,7 @@ Eigen::MatrixXf LQR(PlanarQuadrotor& quadrotor, float dt) {
 }
 
 //plotowanie
-void plot(const std::vector<float>& x_history, const std::vector<float>& y_history, const std::vector<float>& theta_history, std::atomic<bool>& plot_active) {
-    plot_active = false;
+void plot(const std::vector<float>& x_history, const std::vector<float>& y_history, const std::vector<float>& theta_history) {
     matplot::plot3(x_history, y_history, theta_history);
     matplot::xlabel("X");
     matplot::ylabel("Y");
@@ -105,7 +104,7 @@ int main(int argc, char* args[])
         Eigen::VectorXf state = Eigen::VectorXf::Zero(6);
         while (!quit)
         {
-            static std::atomic<bool> plot_active = false;
+            bool plot_active = false;
             //events
             while (SDL_PollEvent(&e) != 0)
             {
@@ -124,9 +123,8 @@ int main(int argc, char* args[])
                 }
                 else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_p && plot_active == false) {
                     plot_active = true;
-                    std::thread plot_thread(plot, x_history, y_history, theta_history, std::ref(plot_active));
+                    std::thread plot_thread(plot, x_history, y_history, theta_history);
                     plot_thread.detach();
-                    plot_active = false;
                 }
 
 
