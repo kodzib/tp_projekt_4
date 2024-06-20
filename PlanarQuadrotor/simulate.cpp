@@ -43,8 +43,8 @@ void plot(const std::vector<float>& x_history, const std::vector<float>& y_histo
     matplot::show();
 }
 
-void play_audio(char[30]) {
-    PlaySound("sound.wav", GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC | SND_LOOP);
+void play_audio(char plik[30]) {
+    PlaySound(plik, GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC | SND_LOOP);
 }
 
 void control(PlanarQuadrotor& quadrotor, const Eigen::MatrixXf& K) {
@@ -153,12 +153,12 @@ int main(int argc, char* args[])
             theta_history.push_back(quadrotor.GetState()[2]);
 
             if (sqrt(pow(quadrotor.GetState()[3], 2) + pow(quadrotor.GetState()[4], 2)) > sqrt(pow(prev_xdot, 2) + pow(prev_ydot, 2)) && audio_active1 == false) {
-                play_audio("sound125.wav");
+                play_audio("dron2.wav");
                 audio_active1 = true;
                 audio_active2 = true;
             }
             else if (sqrt(pow(quadrotor.GetState()[3], 2) + pow(quadrotor.GetState()[4], 2)) <= sqrt(pow(prev_xdot, 2) + pow(prev_ydot, 2)) && audio_active2 == true) {
-                play_audio("sound.wav");
+                play_audio("dron1.wav");
                 audio_active2 = false;
                 audio_active1 = false;
             };
