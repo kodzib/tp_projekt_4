@@ -10,7 +10,7 @@
 #include <mciapi.h>
 #pragma comment(lib, "winmm.lib")
 
-Eigen::MatrixXf LQR(PlanarQuadrotor &quadrotor, float dt) {
+Eigen::MatrixXf LQR(PlanarQuadrotor& quadrotor, float dt) {
     /* Calculate LQR gain matrix */
     Eigen::MatrixXf Eye = Eigen::MatrixXf::Identity(6, 6);
     Eigen::MatrixXf A = Eigen::MatrixXf::Zero(6, 6);
@@ -29,11 +29,11 @@ Eigen::MatrixXf LQR(PlanarQuadrotor &quadrotor, float dt) {
     std::tie(A, B) = quadrotor.Linearize();
     A_discrete = Eye + dt * A;
     B_discrete = dt * B;
-    
+
     return LQR(A_discrete, B_discrete, Q, R);
 }
 
-    //plotowanie
+//plotowanie
 void plot(const std::vector<float>& x, const std::vector<float>& y, const std::vector<float>& theta, std::atomic<bool>& plot_active) {
     plot_active = false;
     matplot::plot3(x, y, theta);
@@ -44,12 +44,13 @@ void plot(const std::vector<float>& x, const std::vector<float>& y, const std::v
     matplot::show();
 }
 
+//musialem dac dwa rozne audio to mozna usuanc t¹ funckje lub dac tam jakeis variable co sie nazwe pliku bedzie wpisywac
 void play_audio() {
     PlaySound("sound.wav", GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC | SND_LOOP);
     std::cout << std::endl << "audio" << std::endl;
 }
 
-void control(PlanarQuadrotor &quadrotor, const Eigen::MatrixXf &K) {
+void control(PlanarQuadrotor& quadrotor, const Eigen::MatrixXf& K) {
     Eigen::Vector2f input = quadrotor.GravityCompInput();
     quadrotor.SetInput(input - K * quadrotor.GetControlState());
 }
@@ -68,7 +69,7 @@ int main(int argc, char* args[])
      * 2. Update PlanarQuadrotor from simulation when goal is changed
     */
     Eigen::VectorXf initial_state = Eigen::VectorXf::Zero(6);
-    initial_state << SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, 0, 0, 0;
+    initial_state << 0, 0, 0, 0, 0, 0;
     PlanarQuadrotor quadrotor(initial_state);
     PlanarQuadrotorVisualizer quadrotor_visualizer(&quadrotor);
     /**
@@ -77,7 +78,7 @@ int main(int argc, char* args[])
      * For implemented LQR controller, it has to be [x, y, 0, 0, 0, 0]
     */
     Eigen::VectorXf goal_state = Eigen::VectorXf::Zero(6);
-    goal_state << SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, 0, 0, 0;
+    goal_state << 0, 0, 0, 0, 0, 0;
     quadrotor.SetGoal(goal_state);
     /* Timestep for the simulation */
     const float dt = 0.001;
@@ -100,16 +101,18 @@ int main(int argc, char* args[])
         float delay;
         int x, y;
         float x_p, y_p;
+        bool audio_active1 = false;
+        bool audio_active2 = false;
+        float prev_xdot = 0;
+        float prev_ydot = 0;
         Eigen::VectorXf state = Eigen::VectorXf::Zero(6);
-        play_audio();
-     
-
         while (!quit)
-        {   
+        {
             static std::atomic<bool> plot_active = false;
             //events
             while (SDL_PollEvent(&e) != 0)
             {
+
                 if (e.type == SDL_QUIT)
                 {
                     quit = true;
@@ -123,18 +126,18 @@ int main(int argc, char* args[])
                 }
                 else if (e.type == SDL_MOUSEBUTTONDOWN) {
                     //std::cout << "Mouse pressed" << std::endl;
-                    goal_state << x, y, 0, 0, 0, 0;
+                    goal_state << x - (SCREEN_WIDTH / 2), y - (SCREEN_HEIGHT / 2), 0, 0, 0, 0;
                     quadrotor.SetGoal(goal_state);
                 }
-                else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_p && plot_active ==false) {
+                else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_p && plot_active == false) {
                     plot_active = true;
                     std::thread plot_thread(plot, x_history, y_history, theta_history, std::ref(plot_active));
                     plot_thread.detach();
                     plot_active = false;
                 }
-                
-            }
 
+
+            }
             SDL_Delay((int)dt * 1000);
 
             SDL_SetRenderDrawColor(gRenderer.get(), 0xFF, 0xFF, 0xFF, 0xFF);
@@ -143,7 +146,7 @@ int main(int argc, char* args[])
             /* Quadrotor rendering step */
             quadrotor_visualizer.render(gRenderer);
 
-            
+
 
             SDL_RenderPresent(gRenderer.get());
 
@@ -155,6 +158,21 @@ int main(int argc, char* args[])
             x_history.push_back(quadrotor.GetState()[0]);
             y_history.push_back(quadrotor.GetState()[1]);
             theta_history.push_back(quadrotor.GetState()[2]);
+
+            if (sqrt(pow(quadrotor.GetState()[3], 2) + pow(quadrotor.GetState()[4], 2)) > sqrt(pow(prev_xdot, 2) + pow(prev_ydot, 2)) && audio_active1 == false) {
+                PlaySound("sound125.wav", GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC | SND_LOOP);
+                audio_active1 = true;
+                audio_active2 = true;
+            }
+            else if (sqrt(pow(quadrotor.GetState()[3], 2) + pow(quadrotor.GetState()[4], 2)) <= sqrt(pow(prev_xdot, 2) + pow(prev_ydot, 2)) && audio_active2 == true) {
+                PlaySound("sound.wav", GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC | SND_LOOP);
+                audio_active2 = false;
+                audio_active1 = false;
+            };
+            prev_xdot = quadrotor.GetState()[3];
+            prev_ydot = quadrotor.GetState()[4];
+
+
         }
     }
     SDL_Quit();
@@ -177,4 +195,3 @@ int init(std::shared_ptr<SDL_Window>& gWindow, std::shared_ptr<SDL_Renderer>& gR
     }
     return 0;
 }
-
