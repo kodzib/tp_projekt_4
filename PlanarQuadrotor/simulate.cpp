@@ -34,20 +34,17 @@ Eigen::MatrixXf LQR(PlanarQuadrotor& quadrotor, float dt) {
 }
 
 //plotowanie
-void plot(const std::vector<float>& x, const std::vector<float>& y, const std::vector<float>& theta, std::atomic<bool>& plot_active) {
+void plot(const std::vector<float>& x_history, const std::vector<float>& y_history, const std::vector<float>& theta_history, std::atomic<bool>& plot_active) {
     plot_active = false;
-    matplot::plot3(x, y, theta);
-    //matplot::plot(x, y);
+    matplot::plot3(x_history, y_history, theta_history);
     matplot::xlabel("X");
     matplot::ylabel("Y");
     matplot::zlabel("Theta");
     matplot::show();
 }
 
-//musialem dac dwa rozne audio to mozna usuanc t¹ funckje lub dac tam jakeis variable co sie nazwe pliku bedzie wpisywac
-void play_audio() {
+void play_audio(char[30]) {
     PlaySound("sound.wav", GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC | SND_LOOP);
-    std::cout << std::endl << "audio" << std::endl;
 }
 
 void control(PlanarQuadrotor& quadrotor, const Eigen::MatrixXf& K) {
@@ -156,12 +153,12 @@ int main(int argc, char* args[])
             theta_history.push_back(quadrotor.GetState()[2]);
 
             if (sqrt(pow(quadrotor.GetState()[3], 2) + pow(quadrotor.GetState()[4], 2)) > sqrt(pow(prev_xdot, 2) + pow(prev_ydot, 2)) && audio_active1 == false) {
-                PlaySound("sound125.wav", GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC | SND_LOOP);
+                play_audio("sound125.wav");
                 audio_active1 = true;
                 audio_active2 = true;
             }
             else if (sqrt(pow(quadrotor.GetState()[3], 2) + pow(quadrotor.GetState()[4], 2)) <= sqrt(pow(prev_xdot, 2) + pow(prev_ydot, 2)) && audio_active2 == true) {
-                PlaySound("sound.wav", GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC | SND_LOOP);
+                play_audio("sound.wav");
                 audio_active2 = false;
                 audio_active1 = false;
             };
