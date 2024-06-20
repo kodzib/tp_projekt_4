@@ -108,9 +108,9 @@ void PlanarQuadrotorVisualizer::render(std::shared_ptr<SDL_Renderer>& gRenderer)
         color2 = pom;
     }
     else {
-        if (color1 != 0xFF005530 && color1 != 0xFF550055) {
-            color1 = 0xFF005530;
-            color2 = 0xFF550055;
+        if (color1 != 0xFF550000 && color1 != 0x22550000) {
+            color1 = 0xFF550000;
+            color2 = 0x22550000;
         }
         pom = color1;
         color1 = color2;;
